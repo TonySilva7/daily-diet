@@ -19,19 +19,12 @@ export default function App() {
 
   return (
     <ThemeProvider theme={appTheme}>
-      <SafeAreaView
-        style={{
-          height: '100%',
-          backgroundColor: '#a87cff',
-        }}
-      >
-        <StatusBar
-          barStyle="dark-content"
-          backgroundColor="transparent"
-          translucent
-        />
-        {fontsLoaded ? <Routes /> : <Loading />}
-      </SafeAreaView>
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="transparent"
+        translucent
+      />
+      {fontsLoaded ? <Routes /> : <Loading />}
     </ThemeProvider>
   )
 }
