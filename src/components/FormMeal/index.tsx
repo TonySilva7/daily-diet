@@ -6,6 +6,7 @@ import { Title } from '@components/Title'
 import { Circle } from 'phosphor-react-native'
 import { View, ViewProps } from 'react-native'
 import { BottomContent } from './styles'
+import { useMeal } from '@view-model/meal'
 
 type FormMealProps = ViewProps & {
   onCreatedMeal: () => void
@@ -13,17 +14,30 @@ type FormMealProps = ViewProps & {
 }
 
 export function FormMeal({ onCreatedMeal, mealId, ...rest }: FormMealProps) {
+  const { newMealState, setNewMealState } = useMeal()
+
   return (
     <ContentContainer style={{ justifyContent: 'space-between' }} {...rest}>
       {mealId && <Title>É EDIÇÃO: {mealId}</Title>}
       <View style={{ width: '100%', rowGap: 18 }}>
-        <Input label="Nome da refeição" placeholder="Qual refeição?" />
+        <Input
+          label="Nome da refeição"
+          placeholder="Qual refeição?"
+          value={newMealState.name}
+          onChangeText={(text) =>
+            setNewMealState({ ...newMealState, name: text })
+          }
+        />
         <Input
           label="Descrição"
           height={120}
           placeholder="Sobre a refeição"
           textAlignVertical="top"
           multiline
+          value={newMealState.description}
+          onChangeText={(text) =>
+            setNewMealState({ ...newMealState, description: text })
+          }
         />
         <View
           style={{
