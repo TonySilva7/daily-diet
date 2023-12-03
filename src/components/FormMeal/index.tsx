@@ -46,7 +46,12 @@ export function FormMeal({ onCreatedMeal, mealId, ...rest }: FormMealProps) {
             width: '100%',
           }}
         >
-          <Input label="Data" placeholder="Quando?" widthWrapper={48} />
+          <Input
+            label="Data"
+            placeholder="Quando?"
+            widthWrapper={48}
+            textContentType="oneTimeCode"
+          />
           <Input label="Hora" placeholder="Que horas?" widthWrapper={48} />
         </View>
 
