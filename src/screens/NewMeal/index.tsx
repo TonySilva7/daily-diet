@@ -12,16 +12,18 @@ type IParams = {
 }
 
 export function NewMeal({ ...rest }: NewMealProps) {
-  const { navigate } = useNavigation()
+  // const { navigate } = useNavigation()
   const { params } = useRoute()
 
-  const handleCreateMeal = () => {
-    navigate('confirmCreateMeal')
-  }
+  // const handleCreateMeal = () => {
+  //   navigate('confirmCreateMeal')
+  // }
   return (
     <Container {...rest}>
       <Header
-        title="Nova refeição"
+        title={
+          (params as IParams)?.mealId ? 'Editar Refeição' : 'Nova refeição'
+        }
         linkTo="/home"
         topIcon={55}
         leftIcon={20}
@@ -30,7 +32,7 @@ export function NewMeal({ ...rest }: NewMealProps) {
       />
 
       <FormMeal
-        onCreatedMeal={handleCreateMeal}
+        // onCreatedMeal={handleCreateMeal}
         mealId={(params as IParams)?.mealId}
       />
     </Container>

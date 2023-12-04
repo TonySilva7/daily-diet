@@ -2,6 +2,7 @@ import { IMeal } from '@models/Meal'
 import { MealRepository } from '@repositories/Meal/impl'
 import { IMealDTO } from '@services/Meal/dto'
 import { MealService } from '@services/Meal/impl'
+import { formatToDate } from '@utils/formatters/date'
 import { useState } from 'react'
 
 export type IPayload = {
@@ -12,13 +13,14 @@ export type IPayload = {
 export const useMeal = () => {
   const mealRepo = new MealRepository()
   const mealServices = new MealService(mealRepo)
-  const [newMealState, setNewMealState] = useState<IMeal>({
+
+  const [newMealState, setNewMealState] = useState<IMealDTO>({
     id: new Date().getTime().toString(),
     name: '',
     description: '',
     date: new Date(),
     hour: new Date(),
-    isDiet: false,
+    isDiet: null,
   })
 
   return {
@@ -30,7 +32,7 @@ export const useMeal = () => {
 
       const mealsGroupedByDate = meals.reduce(
         (acc: IPayload[], meal: IMealDTO): IPayload[] => {
-          const date = meal.date
+          const date = formatToDate(meal.date)
 
           const mealGroup = acc.find((group) => group.title === date)
 
@@ -50,37 +52,51 @@ export const useMeal = () => {
 
       return mealsGroupedByDate
     },
-    getMeal: async (mealId: string): Promise<IMeal> => {
+
+    getMeal: async (mealId: string): Promise<IMealDTO> => {
       const meal = await mealServices.getMeal(mealId)
-      const toMeal = mealServices.fromDTO(meal)
-      return toMeal
+
+      return meal
     },
-    createMeal: async (meal: IMeal): Promise<void> => {
+
+    createMeal: async (meal: IMealDTO): Promise<void> => {
       await mealServices.createMeal(meal)
     },
-    updateMeal: async (meal: IMeal): Promise<void> => {
-      const toMealDTO = mealServices.toDTO(meal)
-      await mealServices.updateMeal(toMealDTO)
+
+    updateMeal: async (meal: IMealDTO): Promise<void> => {
+      await mealServices.updateMeal(meal)
     },
+
     deleteMeal: async (mealId: string): Promise<void> => {
       await mealServices.deleteMeal(mealId)
     },
+
     getTotalMeals: async (): Promise<number> => {
       const totalMeals = await mealServices.getTotalMeals()
       return totalMeals
     },
+
     getMealsWithinDiets: async (): Promise<number> => {
       const mealsWithinDiets = await mealServices.getMealsWithinDiets()
       return mealsWithinDiets
     },
+
     getMealsOutsideDiets: async (): Promise<number> => {
       const mealsOutsideDiets = await mealServices.getMealsOutsideDiets()
       return mealsOutsideDiets
     },
-    getMealsWithinDietsInPercentage: async (): Promise<number> => {
+
+    getMealsWithinDietsInPercentage: async (): Promise<string> => {
       const mealsWithinDietsInPercentage =
-        await mealServices.getMealsWithinDietsInPercentage()
-      return mealsWithinDietsInPercentage
+        await mealServices.getDietsOnPercentage()
+
+      return mealsWithinDietsInPercentage.toFixed(0)
+    },
+
+    getBestSequencePlates: async (): Promise<number> => {
+      const bestSequencePlates = await mealServices.bestSequencePlates()
+
+      return bestSequencePlates
     },
   }
 }

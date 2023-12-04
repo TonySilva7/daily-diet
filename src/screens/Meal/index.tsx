@@ -4,7 +4,7 @@ import { Header } from '@components/Header'
 import { Title } from '@components/Title'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { Circle, PencilSimpleLine, Trash } from 'phosphor-react-native'
-import { Modal, Text, View, ViewProps } from 'react-native'
+import { Alert, Modal, Text, View, ViewProps } from 'react-native'
 import { useTheme } from 'styled-components/native'
 import {
   BadgeMeal,
@@ -14,7 +14,10 @@ import {
   OverlayModal,
   TitleContent,
 } from './styles'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useMeal } from '@view-model/meal'
+import { formatToDate, formatToHour } from '@utils/formatters/date'
+import { MealError } from '@utils/errors/meal'
 
 type MealProps = ViewProps
 
@@ -25,15 +28,30 @@ type RouteParams = {
 export function Meal({ ...rest }: MealProps) {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const { colors } = useTheme()
+  const { getMeal, newMealState, setNewMealState, deleteMeal } = useMeal()
 
   const { navigate } = useNavigation()
   const { params } = useRoute()
 
   const { mealId } = params as RouteParams
 
-  function removeMeal() {
-    // remover
-    setIsModalVisible(false)
+  async function removeMeal() {
+    try {
+      await deleteMeal(mealId as string)
+
+      setIsModalVisible(false)
+
+      return navigate('home')
+    } catch (error) {
+      if (error instanceof MealError) {
+        return Alert.alert('Erro ao excluir refeição', error.message)
+      }
+
+      return Alert.alert(
+        'Erro ao excluir refeição',
+        'Ocorreu um erro ao excluir a refeição, tente novamente mais tarde.',
+      )
+    }
   }
 
   function handleRemoveMeal() {
@@ -44,15 +62,41 @@ export function Meal({ ...rest }: MealProps) {
     navigate('newMeal', { mealId })
   }
 
+  useEffect(() => {
+    async function getMealById() {
+      const meal = await getMeal(mealId as string)
+      setNewMealState(meal)
+    }
+
+    if (mealId) {
+      getMealById()
+    }
+
+    return () => {
+      setNewMealState({
+        id: '',
+        name: '',
+        description: '',
+        date: new Date(),
+        hour: new Date(),
+        isDiet: null,
+      })
+    }
+  }, [mealId])
+
+  const date = formatToDate(newMealState.date)
+  const hour = formatToHour(newMealState.hour)
+
   return (
     <MealWrapper {...rest}>
       <Header
-        title="Nova refeição"
+        title="Refeição"
         linkTo="/home"
         topIcon={55}
         leftIcon={20}
         titleSize="s_18"
         height="small"
+        variant={newMealState.isDiet ? 'primary' : 'secondary'}
       />
 
       <ContentContainer
@@ -64,21 +108,31 @@ export function Meal({ ...rest }: MealProps) {
         <View style={{ width: '100%', rowGap: 20 }}>
           <TitleContent>
             <Title size="s_18" weight="bold">
-              Sanduíche {mealId}
+              {newMealState.name}
             </Title>
-            <Text>
-              Sanduíche de pão integral com atum e salada de alface e tomate
-            </Text>
+            <Text>{newMealState.description}</Text>
           </TitleContent>
 
           <DateContent>
             <Title weight="bold">Data e hora</Title>
-            <Text>12/08/2022 às 16:00</Text>
+            <Text>
+              {date} às {hour}
+            </Text>
           </DateContent>
 
           <BadgeMeal>
-            <Circle size={10} weight="fill" color={colors.product.green.dark} />
-            <Text>Dentro da dieta</Text>
+            <Circle
+              size={10}
+              weight="fill"
+              color={
+                newMealState.isDiet
+                  ? colors.product.green.dark
+                  : colors.product.red.dark
+              }
+            />
+            <Text>
+              {newMealState.isDiet ? 'Dentro da dieta' : 'Fora da dieta'}
+            </Text>
           </BadgeMeal>
         </View>
 

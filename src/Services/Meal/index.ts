@@ -7,7 +7,7 @@ export interface IMealServiceDTO {
 
   getMeals: () => Promise<IMealDTO[]>
   getMeal: (mealId: string) => Promise<IMealDTO>
-  createMeal: (meal: IMeal) => Promise<void>
+  createMeal: (meal: IMealDTO) => Promise<void>
   updateMeal: (meal: IMealDTO) => Promise<void>
   deleteMeal: (mealId: string) => Promise<void>
 }
@@ -17,5 +17,6 @@ export interface IMealService extends IMealServiceDTO {
 
   getMealsWithinDiets: () => Promise<number>
   getMealsOutsideDiets: () => Promise<number>
-  getMealsWithinDietsInPercentage: () => Promise<number>
+  getDietsOnPercentage: () => Promise<number>
+  bestSequencePlates: () => Promise<number>
 }

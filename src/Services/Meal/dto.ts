@@ -2,7 +2,7 @@ export interface IMealDTO {
   id: string
   name: string
   description: string
-  date: string
-  hour: string
-  isDiet: boolean
+  date: Date
+  hour: Date
+  isDiet: boolean | null
 }

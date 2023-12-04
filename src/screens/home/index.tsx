@@ -4,30 +4,60 @@ import { Logo } from '@components/Logo'
 import { MealItem } from '@components/MealItem'
 import { ResumeCard } from '@components/ResumeCard'
 import { Title } from '@components/Title'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { IPayload, useMeal } from '@view-model/meal'
 import { Plus } from 'phosphor-react-native'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useCallback, useEffect, useState } from 'react'
 import { SafeAreaView, SectionList } from 'react-native'
 import { useTheme } from 'styled-components/native'
 import { Header, HomeWrapper } from './styles'
+import { formatToHour } from '@utils/formatters/date'
+import { MealError } from '@utils/errors/meal'
 
 type HomeProps = ComponentProps<typeof HomeWrapper>
 
 export function Home({ ...rest }: HomeProps) {
   const [meals, setMeals] = useState<IPayload[]>([])
+  const [mealsWithinDietsInPercentage, setMealsWithinDietsInPercentage] =
+    useState<string>('0')
   const { colors } = useTheme()
   const { navigate } = useNavigation()
-  const { getMeals } = useMeal()
+  const { getMeals, getMealsWithinDietsInPercentage } = useMeal()
 
-  useEffect(() => {
-    async function loadMeals() {
-      const meals = await getMeals()
-      setMeals(meals)
-    }
+  useFocusEffect(
+    useCallback(() => {
+      async function loadMeals() {
+        try {
+          const meals = await getMeals()
+          setMeals(meals)
 
-    loadMeals()
-  }, [getMeals])
+          const result = await getMealsWithinDietsInPercentage()
+          setMealsWithinDietsInPercentage(result)
+        } catch (error) {
+          if (error instanceof MealError) {
+            // setMealsWithinDietsInPercentage(0)
+            // setMeals([])
+          }
+
+          console.log(error)
+        }
+      }
+
+      loadMeals()
+    }, []),
+  )
+
+  // useEffect(() => {
+  //   async function loadMeals() {
+  //     const meals = await getMeals()
+  //     setMeals(meals)
+
+  //     const result = await getMealsWithinDietsInPercentage()
+  //     setMealsWithinDietsInPercentage(result)
+  //   }
+
+  //   loadMeals()
+  // }, [])
 
   return (
     <SafeAreaView style={{ backgroundColor: colors.base.gray.gray7 }}>
@@ -43,7 +73,7 @@ export function Home({ ...rest }: HomeProps) {
         </Header>
 
         <ResumeCard
-          titleContent="90,86%"
+          titleContent={`${mealsWithinDietsInPercentage}%`}
           subTitleContent="das refeições dentro da dieta"
           onPress={() => navigate('statistics')}
           titleStyle={{
@@ -70,15 +100,15 @@ export function Home({ ...rest }: HomeProps) {
           // ItemSeparatorComponent={() => <View style={{ marginVertical: 7 }} />}
           renderItem={({ item }) => (
             <MealItem
-              hour={item.hour}
+              hour={formatToHour(item.hour)}
               foodName={item.name}
-              badgeColor={item.hour === '20:00' ? 'primary' : 'secondary'}
+              badgeColor={item.isDiet ? 'primary' : 'secondary'}
               onPress={() => navigate('mealDetails', { mealId: item.id })}
             />
           )}
           renderSectionHeader={({ section: { title } }) => (
             <Title size="s_18" weight="bold" margin={[15, 0, 0]}>
-              {title}
+              {title.replaceAll('/', '.')}
             </Title>
           )}
           ListEmptyComponent={() => (
