@@ -134,10 +134,8 @@ export class MealService implements IMealService {
         currentSequence.length > 0
           ? formatToDate(currentSequence[currentSequence.length - 1].date)
           : ''
-      console.log('currDay: ', currDay)
 
       const mealDate = formatToDate(meal.date)
-      console.log('mealDate: ', mealDate)
 
       const isSameDay = currDay === mealDate
 

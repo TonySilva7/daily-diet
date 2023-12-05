@@ -5,14 +5,14 @@ import { MealItem } from '@components/MealItem'
 import { ResumeCard } from '@components/ResumeCard'
 import { Title } from '@components/Title'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { MealError } from '@utils/errors/meal'
+import { formatToHour } from '@utils/formatters/date'
 import { IPayload, useMeal } from '@view-model/meal'
 import { Plus } from 'phosphor-react-native'
-import { ComponentProps, useCallback, useEffect, useState } from 'react'
+import { ComponentProps, useCallback, useState } from 'react'
 import { SafeAreaView, SectionList } from 'react-native'
 import { useTheme } from 'styled-components/native'
 import { Header, HomeWrapper } from './styles'
-import { formatToHour } from '@utils/formatters/date'
-import { MealError } from '@utils/errors/meal'
 
 type HomeProps = ComponentProps<typeof HomeWrapper>
 
@@ -44,6 +44,7 @@ export function Home({ ...rest }: HomeProps) {
       }
 
       loadMeals()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
   )
 

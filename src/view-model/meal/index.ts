@@ -1,4 +1,3 @@
-import { IMeal } from '@models/Meal'
 import { MealRepository } from '@repositories/Meal/impl'
 import { IMealDTO } from '@services/Meal/dto'
 import { MealService } from '@services/Meal/impl'

@@ -46,6 +46,7 @@ export function Statistics({ ...rest }: StatisticsProps) {
     }
 
     loadStats()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

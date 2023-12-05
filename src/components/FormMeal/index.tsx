@@ -11,6 +11,7 @@ import { Alert, View, ViewProps } from 'react-native'
 import { BottomContent } from './styles'
 import { useNavigation } from '@react-navigation/native'
 import { useEffect } from 'react'
+import { useTheme } from 'styled-components/native'
 
 type FormMealProps = ViewProps & {
   // onCreatedMeal: () => void
@@ -18,6 +19,7 @@ type FormMealProps = ViewProps & {
 }
 
 export function FormMeal({ mealId, ...rest }: FormMealProps) {
+  const { colors } = useTheme()
   const { newMealState, setNewMealState, createMeal, getMeal, updateMeal } =
     useMeal()
   const { navigate } = useNavigation()
@@ -100,6 +102,7 @@ export function FormMeal({ mealId, ...rest }: FormMealProps) {
     if (mealId) {
       loadMeal()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mealId])
 
   return (
@@ -152,6 +155,8 @@ export function FormMeal({ mealId, ...rest }: FormMealProps) {
                 setNewMealState({ ...newMealState, date: selectedDate as Date })
               }
               style={{ margin: 0, padding: 0, flex: 1 }}
+              textColor="black"
+              accentColor={colors.product.green.dark}
             />
           </View>
 
@@ -175,11 +180,9 @@ export function FormMeal({ mealId, ...rest }: FormMealProps) {
               onChange={(event, selectedDate) =>
                 setNewMealState({ ...newMealState, hour: selectedDate as Date })
               }
+              accentColor={colors.product.green.dark}
             />
           </View>
-
-          {/* <Input label="Data" placeholder="Quando?" widthWrapper={48} />
-          <Input label="Hora" placeholder="Que horas?" widthWrapper={48} /> */}
         </View>
 
         <Title size="s_14" weight="bold">
